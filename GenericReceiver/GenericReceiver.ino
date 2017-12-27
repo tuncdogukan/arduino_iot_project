@@ -38,7 +38,7 @@ void setup()
   display.setCursor(0, 0);
 
   radio.begin();
-  radio.setPALevel(RF24_PA_HIGH);
+  radio.setPALevel(RF24_PA_MIN);
   radio.setDataRate(RF24_1MBPS);
   radio.setPayloadSize(8);
   radio.openReadingPipe(1, pipe);
