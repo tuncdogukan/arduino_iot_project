@@ -90,7 +90,7 @@ void setup(void)
   radio.setRetries(15,15);
   
   radio.setPALevel(RF24_PA_HIGH);
-  radio.setDataRate(RF24_250KBPS);
+  radio.setDataRate(RF24_1MBPS);
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
@@ -127,6 +127,9 @@ void setup(void)
   //
 
   radio.printDetails();
+
+
+  writeSingleMessage(strcat("Role: ",role_friendly_name[role]));
 }
 
 void loop(void)
@@ -138,6 +141,9 @@ void loop(void)
   if (role == role_ping_out)
   {
     // First, stop listening so we can talk.
+
+    
+    
     radio.stopListening();
 
     // Take the time, and send it.  This will block until complete
@@ -199,13 +205,20 @@ void loop(void)
   {
     // if there is data ready
     if ( radio.available() )
-    {
-      writeSingleMessage("Waiting for data...");
-      
+    {      
       
       // Dump the payloads until we've gotten everything
       unsigned long got_time;
       bool done = false;
+      
+      msgCnt++;
+
+      display.clearDisplay();
+      display.setCursor(0, 0);
+      display.print("Message No: ");
+      display.print(msgCnt);
+      display.display();
+      
       while (!done)
       {
         // Fetch the payload, and see if this was the last one.
@@ -213,10 +226,8 @@ void loop(void)
 
         // Spew it
         printf("Got payload %lu...",got_time);
-        msgCnt++;
-        writeSingleMessage("Got data...");
-        display.print(msgCnt);
-
+        
+        
         // Delay just a little bit to let the other unit
         // make the transition to receiver
         delay(20);
@@ -228,6 +239,7 @@ void loop(void)
       // Send the final one back.
       radio.write( &got_time, sizeof(unsigned long) );
       printf("Sent response.\n\r");
+      
 
       // Now, resume listening so we catch the next packets.
       radio.startListening();

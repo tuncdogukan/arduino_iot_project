@@ -64,7 +64,7 @@ void setup(void)
   radio.setRetries(15,15);
   
   radio.setPALevel(RF24_PA_HIGH);
-  radio.setDataRate(RF24_250KBPS);
+  radio.setDataRate(RF24_1MBPS);
 
   // optionally, reduce the payload size.  seems to
   // improve reliability
