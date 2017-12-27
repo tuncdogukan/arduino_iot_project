@@ -39,7 +39,7 @@ void setup()
 
   radio.begin();
   radio.setPALevel(RF24_PA_HIGH);
-  radio.setDataRate(RF24_250KBPS);
+  radio.setDataRate(RF24_1MBPS);
   radio.setPayloadSize(8);
   radio.openReadingPipe(1, pipe);
 
@@ -50,21 +50,26 @@ void setup()
   radio.printDetails();
 
 
-  writeSingleMessage("Started reading...");
+  writeSingleLine("Started reading...");
 
 }
 
 void loop()
 {      
-  if (radio.available())
-  {
-    //writeSingleMessage("Catched something.");
-      
-    done = radio.read(msg, 8);
 
-    if (done)
+  if ( radio.available() )
     {
-      writeSingleMessage("MESSAGE RECEIVED.");
+      bool done = false;
+      
+      while (!done)
+      {
+        // Fetch the payload, and see if this was the last one.
+        done = radio.read( &msg, 8 );
+        
+        delay(20);
+      }
+
+      writeSingleLine("MESSAGE RECEIVED.");
       
  
       if (msg[2] == 0x01)
@@ -91,19 +96,21 @@ void loop()
         display.display();
       
       }
-    }
-    else
-    {
-      Serial.println("No data...");
-    }
 
-    delay(100);
-  }
+
+      delay(100);
+    }
 }
 
 
 
 void writeSingleMessage(char* msg)
+{
+  display.print(msg);
+  display.display();
+}
+
+void writeSingleLine(char* msg)
 {
   display.clearDisplay();
   display.setCursor(0, 0);
